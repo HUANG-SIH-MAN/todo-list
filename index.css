@@ -1,0 +1,14 @@
+.checked {
+    color: #ccc;
+    text-decoration: line-through;
+    font-style: italic;
+}
+  
+.fa {
+    margin: 0 5px;
+    color: #bbb;
+}
+  
+li>label[for='todo'] {
+    width: 210px;
+}
