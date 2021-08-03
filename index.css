@@ -1,5 +1,5 @@
 .checked {
-    color: #ccc;
+    color: rgb(255, 0, 0);
     text-decoration: line-through;
     font-style: italic;
 }
@@ -11,4 +11,16 @@
   
 li>label[for='todo'] {
     width: 210px;
+}
+
+.delete:hover{
+    color : red;
+}
+
+.create-information:hover, .more-information:hover {
+    color : rgb(255, 187, 0); 
+}
+
+label:hover{
+    background-color: rgb(145, 208, 238)
 }

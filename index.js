@@ -41,62 +41,22 @@ input.addEventListener("keydown", function (event) {
 allTodo.addEventListener("click", function (event) {
   const target = event.target;
   const parent = target.parentElement;
+
   if (target.classList.contains("delete")) {  //按到刪除
-    swal({
-      title: "確定刪除嗎？",
-      text: "您將無法恢復代辦清單！",
-      type: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#DD6B55",
-      confirmButtonText: "確定刪除！",
-      cancelButtonText: "取消刪除！",
-      closeOnConfirm: false,
-      closeOnCancel: false
-    },
-    function(isConfirm){
-      if (isConfirm) {
-        swal("删除！", "待辦事項已被刪除!!。","success");
-        parent.remove();
-      } else {
-        swal("取消！", "未刪除待辦事項","error");
-      }
-    });
-    
+    alertDelete ()
+      
   } else if (target.tagName === "LABEL") {   //按到代辦清單
     const grandfather = parent.parentElement
     if(grandfather.classList.contains('my-todo')) {   //按到未完成清單
        target.classList.add('checked')
        finshList.appendChild(parent)
     } else {                                          //按到完成清單
-        list.appendChild(parent)
-        target.classList.remove('checked')
+      list.appendChild(parent)
+      target.classList.remove('checked')
     }  
-  } else if (target.classList.contains("create-information")) {  //按到額外資訊
+  } else if (target.classList.contains("create-information")) {  //新增額外資訊
     const todoID = target.previousElementSibling.previousElementSibling.dataset.id
-    //第一次新增額外資訊
-    swal({
-      title: "輸入!",
-      text: "輸入代辦清單詳細內容：",
-      type: "input",
-      showCancelButton: true,
-      closeOnConfirm: false,
-      animation: "slide-from-top",
-      inputPlaceholder: "輸入一些话"
-    },
-    function(inputValue){
-      if (inputValue === false) return false;
-        
-      if (inputValue.trim().length === 0) {
-        swal.showInputError("你需要輸入一些事項！");
-        return false
-      }
-      swal("已儲存！", "你輸入了：" + inputValue,"success");
-      todoImformation[todoID] = inputValue
-      const moreIcon = document.createElement('i')
-      moreIcon.classList.add('fas', 'fa-info-circle', 'more-information')
-      parent.appendChild(moreIcon)
-      target.remove()
-    });
+    addTodoInformation (todoID, target)
     
   } else if (target.classList.contains("more-information")){ //按到額外資訊
     const todo = target.previousElementSibling.previousElementSibling
@@ -134,4 +94,53 @@ function addItem (text) {
   input.value = ''
 }
 
+//彈出視窗警告是否刪除
+function alertDelete () {
+  swal({
+    title: "確定刪除嗎？",
+    text: "您將無法恢復代辦清單！",
+    type: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#DD6B55",
+    confirmButtonText: "確定刪除！",
+    cancelButtonText: "取消刪除！",
+    closeOnConfirm: false,
+    closeOnCancel: false
+  },
+  function(isConfirm){
+    if (isConfirm) {
+      swal("删除！", "待辦事項已被刪除!!。","success");
+      parent.remove();
+    } else {
+      swal("取消！", "未刪除待辦事項","error");
+    }
+  });
+}
 
+//新增額外資訊
+function addTodoInformation (todoID, target) {
+  const parent = target.parentElement;
+  swal({
+    title: "輸入!",
+    text: "輸入代辦清單詳細內容：",
+    type: "input",
+    showCancelButton: true,
+    closeOnConfirm: false,
+    animation: "slide-from-top",
+    inputPlaceholder: "輸入一些话"
+  },
+  function(inputValue){
+    if (inputValue === false) return false;
+      
+    if (inputValue.trim().length === 0) {
+      swal.showInputError("你需要輸入一些事項！");
+      return false
+    }
+    swal("已儲存！", "你輸入了：" + inputValue,"success");
+    todoImformation[todoID] = inputValue
+    const moreIcon = document.createElement('i')
+    moreIcon.classList.add('fas', 'fa-info-circle', 'more-information')
+    parent.appendChild(moreIcon)
+    target.remove()
+  });
+}
