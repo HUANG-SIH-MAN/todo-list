@@ -4,7 +4,7 @@
     font-style: italic;
 }
   
-.fa {
+.fa, .far, .fas {
     margin: 0 5px;
     color: #bbb;
 }

@@ -14,6 +14,9 @@ let todos = [
   "Pay bills"
 ];
 
+//存放todo額外資訊
+let todoImformation = {}
+
 for (let todo of todos) {
   addItem(todo);
 }
@@ -34,12 +37,31 @@ input.addEventListener("keydown", function (event) {
   }
 });
 
-// Todo Delete and check
+// Todo Delete and check and more information
 allTodo.addEventListener("click", function (event) {
   const target = event.target;
   const parent = target.parentElement;
   if (target.classList.contains("delete")) {  //按到刪除
-    parent.remove();
+    swal({
+      title: "確定刪除嗎？",
+      text: "您將無法恢復代辦清單！",
+      type: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#DD6B55",
+      confirmButtonText: "確定刪除！",
+      cancelButtonText: "取消刪除！",
+      closeOnConfirm: false,
+      closeOnCancel: false
+    },
+    function(isConfirm){
+      if (isConfirm) {
+        swal("删除！", "待辦事項已被刪除!!。","success");
+        parent.remove();
+      } else {
+        swal("取消！", "未刪除待辦事項","error");
+      }
+    });
+    
   } else if (target.tagName === "LABEL") {   //按到代辦清單
     const grandfather = parent.parentElement
     if(grandfather.classList.contains('my-todo')) {   //按到未完成清單
@@ -49,6 +71,38 @@ allTodo.addEventListener("click", function (event) {
         list.appendChild(parent)
         target.classList.remove('checked')
     }  
+  } else if (target.classList.contains("create-information")) {  //按到額外資訊
+    const todoID = target.previousElementSibling.previousElementSibling.dataset.id
+    //第一次新增額外資訊
+    swal({
+      title: "輸入!",
+      text: "輸入代辦清單詳細內容：",
+      type: "input",
+      showCancelButton: true,
+      closeOnConfirm: false,
+      animation: "slide-from-top",
+      inputPlaceholder: "輸入一些话"
+    },
+    function(inputValue){
+      if (inputValue === false) return false;
+        
+      if (inputValue.trim().length === 0) {
+        swal.showInputError("你需要輸入一些事項！");
+        return false
+      }
+      swal("已儲存！", "你輸入了：" + inputValue,"success");
+      todoImformation[todoID] = inputValue
+      const moreIcon = document.createElement('i')
+      moreIcon.classList.add('fas', 'fa-info-circle', 'more-information')
+      parent.appendChild(moreIcon)
+      target.remove()
+    });
+    
+  } else if (target.classList.contains("more-information")){ //按到額外資訊
+    const todo = target.previousElementSibling.previousElementSibling
+    const todoID = todo.dataset.id
+    const todoTitle =todo.innerText
+    swal(`${todoTitle}`, `${todoImformation[todoID]}`)
   }
 });
 
@@ -72,8 +126,9 @@ function checktext (text) {
 function addItem (text) {
   const newItem = document.createElement("li");
   newItem.innerHTML = `
-    <label for="todo">${text}</label>
+    <label for="todo" data-id=${text}>${text}</label>
     <i class="delete fa fa-trash"></i>
+    <i class="far fa-plus-square create-information"></i>
   `;
   list.appendChild(newItem);
   input.value = ''
