@@ -1,7 +1,7 @@
 // 初始變數
-const list = document.querySelector("#my-todo");
-const addBtn = document.querySelector("#add-btn");
-const input = document.querySelector("#new-todo");
+const list = document.querySelector("#my-todo")
+const addBtn = document.querySelector("#add-btn")
+const input = document.querySelector("#new-todo")
 const finishList = document.querySelector('#finish-todo')
 const allTodo = document.querySelector('.all-todo')
 
@@ -10,24 +10,24 @@ loadTodo()
 
 // Create (按按鈕輸入)
 addBtn.addEventListener("click", function () {
-  const inputValue = input.value;
+  const inputValue = input.value
   if (checktext (inputValue)) {
-    addItem(inputValue);
+    addItem(inputValue)
   }
-});
+})
 
 //按Enter輸入
 input.addEventListener("keydown", function (event) {
-  const inputValue = input.value ;
+  const inputValue = input.value 
   if (event.which === 13 && checktext (inputValue)) {
-    addItem(inputValue);
+    addItem(inputValue)
   }
-});
+})
 
 // Todo Delete and check and more information
 allTodo.addEventListener("click", function (event) {
-  const target = event.target;
-  const parent = target.parentElement;
+  const target = event.target
+  const parent = target.parentElement
   const todoID = target.dataset.id
 
   if (target.classList.contains("delete")) {  //按到刪除     
@@ -38,11 +38,11 @@ allTodo.addEventListener("click", function (event) {
     if(grandfather.classList.contains('my-todo')) {   //按到未完成清單
       finishList.appendChild(parent)
       target.classList.add('checked')
-      storeFinsh (todoID)
+      storeFinsh (todoID)  //todo變更成已完成
     } else {                                          //按到完成清單
       list.appendChild(parent)
       target.classList.remove('checked')
-      storeFinsh (todoID)
+      storeFinsh (todoID)  //todo變更成未完成
     }  
   } else if (target.classList.contains("create-information")) {  //新增額外資訊  
     addTodoInformation(todoID, target)
@@ -51,50 +51,44 @@ allTodo.addEventListener("click", function (event) {
     const todoId = target.previousElementSibling.dataset.id
     showInformation (todoId)
   }
-});
+})
 
 //函式們////////////////////////////////////////////
+//載入todo畫面
+function renderTodo (title, id, model, className) {
+  const newItem = document.createElement("li")
+  if (model === 'more') {
+    newItem.innerHTML = `
+      <label for="todo" class='${className}' data-id=${id}>${title}</label>  
+      <i class="delete fa fa-trash" data-id=${id}></i>
+      <i class="fas fa-info-circle more-information"></i>
+    `
+  } else if (model === 'create') {
+    newItem.innerHTML = `
+      <label for="todo" class='${className}' data-id=${id}>${title}</label>  
+      <i class="delete fa fa-trash" data-id=${id}></i>
+      <i class="far fa-plus-square create-information" data-id=${id}></i>
+    `   
+  }
+  return newItem
+}
+
 //一開始載入網頁的函式
 function loadTodo () {
   let storeInformation =  JSON.parse(localStorage.getItem('storeTodoInformation')) || [] 
   storeInformation.forEach(item => {
     if (item.finsh === 'No') {
       if (item.information === undefined) {
-        const newItem = document.createElement("li")
-        newItem.innerHTML = `
-          <label for="todo" data-id=${item.id}>${item.title}</label>  
-          <i class="delete fa fa-trash" data-id=${item.id}></i>
-          <i class="far fa-plus-square create-information" data-id=${item.id}></i>
-        `  
-        list.appendChild(newItem)
+        list.appendChild(renderTodo(item.title, item.id, 'create'))
       }else {
-        const newItem = document.createElement("li")
-        newItem.innerHTML = `
-          <label for="todo" data-id=${item.id}>${item.title}</label>  
-          <i class="delete fa fa-trash" data-id=${item.id}></i>
-          <i class="fas fa-info-circle more-information"></i>
-        `;
-        list.appendChild(newItem)
+        list.appendChild(renderTodo(item.title, item.id, 'more'))
       }
-    } else {
+    } else if (item.finsh === 'Yes') {
       if (item.information === undefined) {
-        const newItem = document.createElement("li")
-        newItem.innerHTML = `
-          <label for="todo" class='checked' data-id=${item.id}>${item.title}</label>  
-          <i class="delete fa fa-trash" data-id=${item.id}></i>
-          <i class="far fa-plus-square create-information" data-id=${item.id}></i>
-        `  
-        finishList.appendChild(newItem)
+        finishList.appendChild(renderTodo(item.title, item.id, 'create', 'checked'))
       }else {
-        const newItem = document.createElement("li")
-        newItem.innerHTML = `
-          <label for="todo" class='checked' data-id=${item.id}>${item.title}</label>  
-          <i class="delete fa fa-trash" data-id=${item.id}></i>
-          <i class="fas fa-info-circle more-information"></i>
-        `;
-        finishList.appendChild(newItem)
+        finishList.appendChild(renderTodo(item.title, item.id, 'more', 'checked'))
       }
-
     }
   })
 }
@@ -116,22 +110,15 @@ function checktext (text) {
 
 // 新增代辦清單函式
 function addItem (text) {
-  const newItem = document.createElement("li")
   const todonumber = getTodoNumber()
-  newItem.innerHTML = `
-    <label for="todo" data-id=${todonumber}>${text}</label>  
-    <i class="delete fa fa-trash" data-id=${todonumber}></i>
-    <i class="far fa-plus-square create-information" data-id=${todonumber}></i>
-  `;
-  list.appendChild(newItem)
+  list.appendChild(renderTodo(text, todonumber, 'create'))
   input.value = ''
   storeTodo(todonumber, text)  //將資料儲存進 local storage 
-
 }
 
 //彈出視窗警告是否刪除
 function alertDelete (target, id) {
-  const parent = target.parentElement;
+  const parent = target.parentElement
   swal({
     title: "確定刪除嗎？",
     text: "您將無法恢復代辦清單！",
@@ -145,18 +132,18 @@ function alertDelete (target, id) {
   },
   function(isConfirm){
     if (isConfirm) {
-      swal("删除！", "待辦事項已被刪除!!。","success");
+      swal("删除！", "待辦事項已被刪除!!。","success")
       deleteStoreTodo(id)  //將資料從進 local storage 刪除
-      parent.remove();
+      parent.remove()
     } else {
-      swal("取消！", "未刪除待辦事項","error");
+      swal("取消！", "未刪除待辦事項","error")
     }
   });
 }
 
 //新增額外資訊  
 function addTodoInformation (todoID, target) {
-  const parent = target.parentElement;
+  const parent = target.parentElement
   swal({
     title: "輸入!",
     text: "輸入代辦清單詳細內容：",
@@ -167,13 +154,13 @@ function addTodoInformation (todoID, target) {
     inputPlaceholder: "輸入一些话"
   },
   function(inputValue){
-    if (inputValue === false) return false;
+    if (inputValue === false) return false
       
     if (inputValue.trim().length === 0) {
       swal.showInputError("你需要輸入一些事項！");
       return false
     }
-    swal("已儲存！", "你輸入了：" + inputValue,"success");
+    swal("已儲存！", "你輸入了：" + inputValue,"success")
     const moreIcon = document.createElement('i')
     moreIcon.classList.add('fas', 'fa-info-circle', 'more-information')
     parent.appendChild(moreIcon)
@@ -185,7 +172,7 @@ function addTodoInformation (todoID, target) {
 //顯示出額外資訊
 function showInformation (todoId) {
   let storeInformation =  JSON.parse(localStorage.getItem('storeTodoInformation'))
-  storeInformation.forEach((item) => {
+  storeInformation.forEach(item => {
     if (item.id === Number(todoId)) {
       swal(`${item.title}`, `${item.information}`)
     }
@@ -227,11 +214,11 @@ function deleteStoreTodo (todoId) {
 //將額外資訊存在local storage
 function storeInformation (todoId, information) {
   let storeInformation =  JSON.parse(localStorage.getItem('storeTodoInformation'))
-  storeInformation.forEach((item) => {
+  storeInformation.forEach(item => {
     if (item.id === Number(todoId)) {
       item.information = information
     }
-  });
+  })
   storeInformation = JSON.stringify(storeInformation)
   localStorage.setItem('storeTodoInformation', storeInformation)
 } 
@@ -239,7 +226,7 @@ function storeInformation (todoId, information) {
 //記錄todo是否已經完成
 function storeFinsh (todoId) {
   let storeInformation =  JSON.parse(localStorage.getItem('storeTodoInformation'))  
-  storeInformation.forEach((item) => {
+  storeInformation.forEach(item => {
     if (item.id === Number(todoId)) {
       if (item.finsh === 'No') {
         item.finsh = 'Yes'
@@ -247,7 +234,7 @@ function storeFinsh (todoId) {
         item.finsh = 'No'
       }
     }
-  });
+  })
   storeInformation = JSON.stringify(storeInformation)
   localStorage.setItem('storeTodoInformation', storeInformation)
 }
