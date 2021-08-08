@@ -38,11 +38,11 @@ allTodo.addEventListener("click", function (event) {
     if(grandfather.classList.contains('my-todo')) {   //按到未完成清單
       finishList.appendChild(parent)
       target.classList.add('checked')
-      storeFinsh (todoID)  //todo變更成已完成
+      storeFinsh (todoID, true)  //todo變更成已完成
     } else {                                          //按到完成清單
       list.appendChild(parent)
       target.classList.remove('checked')
-      storeFinsh (todoID)  //todo變更成未完成
+      storeFinsh (todoID, false)  //todo變更成未完成
     }  
   } else if (target.classList.contains("create-information")) {  //新增額外資訊  
     addTodoInformation(todoID, target)
@@ -77,13 +77,13 @@ function renderTodo (title, id, model, className) {
 function loadTodo () {
   let storeInformation =  JSON.parse(localStorage.getItem('storeTodoInformation')) || [] 
   storeInformation.forEach(item => {
-    if (item.finsh === 'No') {
+    if (!item.finsh) {
       if (item.information === undefined) {
         list.appendChild(renderTodo(item.title, item.id, 'create'))
       }else {
         list.appendChild(renderTodo(item.title, item.id, 'more'))
       }
-    } else if (item.finsh === 'Yes') {
+    } else if (item.finsh) {
       if (item.information === undefined) {
         finishList.appendChild(renderTodo(item.title, item.id, 'create', 'checked'))
       }else {
@@ -193,7 +193,7 @@ function storeTodo (id, title) {
   let storetodo ={}
   storetodo.id = id
   storetodo.title = title
-  storetodo.finsh = 'No'
+  storetodo.finsh = false
   storeInformation.push(storetodo)
   storeInformation = JSON.stringify(storeInformation)
   localStorage.setItem('storeTodoInformation', storeInformation)
@@ -201,12 +201,9 @@ function storeTodo (id, title) {
 
 //將已儲存 local storage 的todo資料刪除  
 function deleteStoreTodo (todoId) { 
-  let storeInformation =  JSON.parse(localStorage.getItem('storeTodoInformation'))  
-  storeInformation.forEach((item, index, array) => {
-    if (item.id === Number(todoId)) {
-      array.splice(index, 1)
-    }
-  });
+  let storeInformation =  JSON.parse(localStorage.getItem('storeTodoInformation'))
+  const index = storeInformation.findIndex(item => item.id === Number(todoId))
+  storeInformation.splice(index, 1)
   storeInformation = JSON.stringify(storeInformation)
   localStorage.setItem('storeTodoInformation', storeInformation)
 }
@@ -224,15 +221,11 @@ function storeInformation (todoId, information) {
 } 
 
 //記錄todo是否已經完成
-function storeFinsh (todoId) {
+function storeFinsh (todoId, state) {
   let storeInformation =  JSON.parse(localStorage.getItem('storeTodoInformation'))  
   storeInformation.forEach(item => {
     if (item.id === Number(todoId)) {
-      if (item.finsh === 'No') {
-        item.finsh = 'Yes'
-      } else {
-        item.finsh = 'No'
-      }
+      item.finsh = state
     }
   })
   storeInformation = JSON.stringify(storeInformation)
