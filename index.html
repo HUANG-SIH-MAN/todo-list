@@ -7,37 +7,51 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">   
     <link href="https://cdn.bootcss.com/sweetalert/1.1.3/sweetalert.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <link rel="stylesheet" href="index.css">      
     <title>My todo</title>
 </head>
 <body>
-    <!--todo主體-->
-    <div class="m-5 d-flex flex-column align-items-center">
-        <header class="mb-3">
-          <h4>My Todo</h4>
-          <div class="form-inline">
-            <input type="text" placeholder="add item" id="new-todo" class="form-control mr-2">
-            <button id="add-btn" class="btn btn-info">Add</button>
-          </div>
-        </header>
-        <div class="all-todo">
-            <div class="unfinish-todo">
-                <ul id="my-todo" class="my-todo list-unstyled">
-                    <!-- display todos here -->
-                </ul>
+    <!-- 上方導覽列 -->
+<!-- Image and text -->
+    <nav class="navbar navbar-expand-sm navbar-light bg-light mr-5 ml-5" >
+        <a class="navbar-brand" href="#">
+        <img src="https://image.flaticon.com/icons/png/512/2069/2069604.png" width="30" height="30" class="d-inline-block align-top" alt="">
+        代辦清單
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+              <li class="nav-item active">
+                <a class="nav-link " id="add-new-todo" href="#">新增Todo <span class="sr-only">(current)</span></a>
+              </li>
+            </ul>
+        </div>
+    </nav>
+    <!--網頁主要內容-->
+    <div class="container mt-3" id="main-body">
+        <div class="row">
+            <!--側排顯示代辦清單目錄-->
+            <div class="col-sm-3">
+                <ul id="todo-all-list" class="nav nav-pills flex-column">
+                    <!-- display todo list here -->
+                </ul>                     
             </div>
-            <div class="finish mt-5">
-                <h4>Finsh Todo</h4>
-                <ul id="finish-todo" class="finish-todo list-unstyled">
-                    <!-- display todos here -->
-                </ul>
-            </div> 
+            <div class="col-sm-8 ml-5" id="main-todo" data-state="todo">
+                <!--todo主體-->
+            </div>
         </div>
     </div>
+    
 
     <!--JS套件-->
     <script src="https://cdn.bootcss.com/sweetalert/1.1.3/sweetalert.min.js"></script>
     <script src="https://kit.fontawesome.com/4b13537802.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
     <script src="index.js"></script>
 </body>
 </html>
