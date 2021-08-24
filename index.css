@@ -4,7 +4,7 @@
     font-style: italic;
 }
   
-.fa, .far, .fas {
+li > i {
     margin: 0 5px;
     color: #bbb;
 }
@@ -13,7 +13,7 @@ li>label[for='todo'] {
     width: 210px;
 }
 
-.delete:hover{
+.delete-item:hover{
     color : red;
 }
 
@@ -23,4 +23,12 @@ li>label[for='todo'] {
 
 label:hover{
     background-color: rgb(145, 208, 238)
+}
+
+.explain-img {
+    width: 90%;
+}
+
+.btn-group{
+    height: 45px;
 }
