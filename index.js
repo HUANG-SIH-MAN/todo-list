@@ -53,6 +53,26 @@ const model = {
         const index = itemList.findIndex(item => item.itemNumber === Number(itemNumber))
         itemList.splice(index, 1)
         localStorage.setItem(todoId, JSON.stringify(itemList))
+    },
+    storeFinishItem (itemNumber) {
+        const todoId = String(model.todoNow)
+        const itemList = JSON.parse(localStorage.getItem(todoId))
+        const index = itemList.findIndex(item => item.itemNumber === Number(itemNumber))
+        itemList[index].finish ? itemList[index].finish = false : itemList[index].finish = true
+        localStorage.setItem(todoId, JSON.stringify(itemList))
+        return itemList[index].finish
+    },
+    storeInformaiton (itemNumber, information) {
+        const todoId = String(model.todoNow)
+        const itemList = JSON.parse(localStorage.getItem(todoId))
+        const index = itemList.findIndex(item => item.itemNumber === Number(itemNumber))
+        itemList[index].information = information
+        localStorage.setItem(todoId, JSON.stringify(itemList))
+    },
+    getInformation (itemNumber) {
+        const todoId = String(model.todoNow)
+        const itemList = JSON.parse(localStorage.getItem(todoId))
+        return itemList.find(item => item.itemNumber === Number(itemNumber))
     }
 }
 
@@ -69,7 +89,12 @@ const view = {
                     <p class="lead ml-3 mt-3"><i class="far fa-star mr-2"></i>趕快在下方輸入框輸入，新增代辦清單的細節項目</p>
                     <div class="ml-3 mb-4"><img class="explain-img" src="todoList.png" alt="圖片說明掛了我也沒辦法，靠想像力去操作網頁吧!!!!!"></div>
                     <hr/>
-                    <!--還有新增刪除細項的介紹-->
+                    <p class="lead ml-3 mt-5"><i class="far fa-hand-point-right mr-2"></i>具有多項功能的代辦清單</p>
+                    <p class="lead ml-3 mt-3"><i class="fas fa-pen-fancy mr-2"></i>可以為代辦清單重新命名</p>
+                    <p class="lead ml-3 mt-3"><i class="fas fa-pen-fancy mr-2"></i>刪除代辦清單</p>
+                    <p class="lead ml-3 mt-3"><i class="fas fa-pen-fancy mr-2"></i>替代辦清單新增額外資訊</p>
+                    <p class="lead ml-3 mt-3"><i class="fas fa-pen-fancy mr-2"></i>區分已完成與未完成</p>
+                    <div class="ml-3 mb-4"><img class="explain-img" src="introductTodo.png" alt="圖片說明掛了我也沒辦法，靠想像力去操作網頁吧!!!!!"></div>
                 </div>
             </div>
         `
@@ -97,9 +122,8 @@ const view = {
     alertNoInput () {
         sweetAlert("懶人!!", "給我輸入文字阿!!!","error")
     },
-    renderTodo (todoId, todoname) {
-        const todoContent = JSON.parse(localStorage.getItem(String(todoId))) || []
-
+    renderTodoPanel (todoId, todoname) {
+        //先繪出基本版面
         //上方標題
         let bodyHTML = `
             <div class="container d-flex justify-content-between align-items-center">
@@ -141,16 +165,46 @@ const view = {
             </div>
         `
         mainBody.innerHTML = bodyHTML
+
+        //加入代辦清單項目
+        const todoContent = JSON.parse(localStorage.getItem(String(todoId))) || []
+        todoContent.forEach((item, index) => {
+            if (index !== 0) {
+                view.renderItem(item.itemNumber, item.itemName, item.information, item.finish)
+            }
+        })
+        
     },
-    renderItem (itemNumber, itemName) {
-        const unfinishTodo = document.querySelector('#unfinish-todo')
+    renderItem (itemNumber, itemName, itemInformation, finish) {
         const li = document.createElement('li')
-        li.innerHTML = `
-            <label for="todo" class="create" data-number="${itemNumber}">${itemName}</label>  
-            <i class="fa fa-trash delete-item" data-number="${itemNumber}"></i>
-            <i class="far fa-plus-square create-information" data-number="${itemNumber}"></i>
-        `
-        unfinishTodo.appendChild(li)
+        let inf
+        itemInformation ? inf = 'fas fa-info-circle more-information' : 
+        inf = 'far fa-plus-square create-information' 
+
+        switch (finish) {
+            case true:
+                const finishTodo = document.querySelector('#finish-todo')
+                li.innerHTML = `
+                    <label for="todo" class="create checked" data-number="${itemNumber}">${itemName}</label>  
+                    <i class="fa fa-trash delete-item" data-number="${itemNumber}"></i>
+                    <i class="${inf}" data-number="${itemNumber}"></i>
+                `
+                finishTodo.appendChild(li)
+                break
+            case false:
+                const unfinishTodo = document.querySelector('#unfinish-todo')
+                li.innerHTML = `
+                    <label for="todo" class="create" data-number="${itemNumber}">${itemName}</label>  
+                    <i class="fa fa-trash delete-item" data-number="${itemNumber}"></i>
+                    <i class="${inf}" data-number="${itemNumber}"></i>
+                `                
+                unfinishTodo.appendChild(li)
+                break
+        }
+    },
+    createInformation (target) {
+        target.classList.add('fas', 'fa-info-circle', 'more-information')
+        target.classList.remove('far', 'fa-plus-square', 'create-information')
     }
 }
 
@@ -168,7 +222,7 @@ const control = {
         view.renderAddNewTodo()
     },
     addNewTodo () {
-        let newTodoInput = document.querySelector('#new-todo-input')
+        const newTodoInput = document.querySelector('#new-todo-input')
         const newTodoName = newTodoInput.value.trim()
         if (newTodoName.length === 0) {    //沒輸入文字
             view.alertNoInput()
@@ -183,7 +237,7 @@ const control = {
         control.currentState = STATE.todoList
         mainBody.dataset.state = 'todoList'
         model.todoNow = todoId
-        view.renderTodo(todoId, todoname)
+        view.renderTodoPanel(todoId, todoname)
     },
     deleteTodo (todoId) {
         swal({
@@ -225,7 +279,7 @@ const control = {
             swal("非常好！", "你輸入了：" + inputValue,"success")
             model.storeRenameTodo (todoId, inputValue)
             view.renderTodoList()
-            view.renderTodo(todoId, inputValue)
+            view.renderTodoPanel(todoId, inputValue)
           })
     },
     addTodoItem (todoId) {
@@ -236,7 +290,7 @@ const control = {
             return
         }
         const itemNumber = model.storeItem (todoId, itemInput.value)
-        view.renderItem (itemNumber, itemInput.value)
+        view.renderItem (itemNumber, itemInput.value, false, false)
         itemInput.value = ''
     },
     deleteItem (itemNumber, target) {
@@ -254,6 +308,38 @@ const control = {
             target.parentElement.remove()
             model.deleteItem(itemNumber)
           });
+    },
+    finishItem (itemNumber, target) {
+        target.classList.toggle('checked')
+        const finishState = model.storeFinishItem(itemNumber)
+        const finishPanel = document.querySelector('#finish-todo')
+        const unfinishPanel = document.querySelector('#unfinish-todo')
+        finishState ? finishPanel.appendChild(target.parentElement) : unfinishPanel.appendChild(target.parentElement)
+    },
+    createInformation (itemNumber, target) {
+        swal({
+            title: "輸入詳細資訊！",
+            text: "為你的清單項目新增一些訊息吧 !!!：",
+            type: "input",
+            showCancelButton: true,
+            closeOnConfirm: false,
+            animation: "slide-from-top",
+            inputPlaceholder: "輸入一些文字"
+          },
+          function(inputValue){
+            if (inputValue === false) return false
+            if (inputValue.trim() === "") {
+              swal.showInputError("@*$#&!，接收不到你輸入的訊息!")
+              return false
+            }
+            swal("非常好！", "你輸入了：" + inputValue,"success")
+            model.storeInformaiton(itemNumber, inputValue)
+            view.createInformation(target)
+          })
+    },
+    showInformation (itemNumber) {
+        const information = model.getInformation(itemNumber)
+        swal(`${information.itemName}`, `${information.information}`)
     }
 }
 
@@ -312,7 +398,11 @@ mainBody.addEventListener('click', function clickMainBody(event) {
             } else if (target.matches('.delete-item')) {    //刪除代辦清單項目
                 control.deleteItem(number, target)
             } else if (target.matches('label')) {    //點擊代辦清單項目，(未完成 --→ 完成)，(完成 --→ 未完成)
-               // control.finishItem(number, target)   //未完成
+                control.finishItem(number, target)   
+            } else if (target.matches('.create-information')) {  //新增額外資訊
+                control.createInformation(number, target)
+            } else if (target.matches('.more-information')) {  //顯示額外資訊
+                control.showInformation(number)
             }
             break
     }

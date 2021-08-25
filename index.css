@@ -21,6 +21,10 @@ li>label[for='todo'] {
     color : rgb(255, 187, 0); 
 }
 
+.fa-pen-fancy {
+    transform: rotate(0.75turn);
+}
+
 label:hover{
     background-color: rgb(145, 208, 238)
 }
