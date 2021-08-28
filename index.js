@@ -93,7 +93,7 @@ const view = {
                     <p class="lead ml-3 mt-3"><i class="fas fa-pen-fancy mr-2"></i>可以為代辦清單重新命名</p>
                     <p class="lead ml-3 mt-3"><i class="fas fa-pen-fancy mr-2"></i>刪除代辦清單</p>
                     <p class="lead ml-3 mt-3"><i class="fas fa-pen-fancy mr-2"></i>替代辦清單新增額外資訊</p>
-                    <p class="lead ml-3 mt-3"><i class="fas fa-pen-fancy mr-2"></i>區分已完成與未完成</p>
+                    <p class="lead ml-3 mt-3"><i class="fas fa-pen-fancy mr-2"></i>區分已完成與未完成清單項目</p>
                     <div class="ml-3 mb-4"><img class="explain-img" src="introductTodo.png" alt="圖片說明掛了我也沒辦法，靠想像力去操作網頁吧!!!!!"></div>
                 </div>
             </div>
@@ -141,7 +141,7 @@ const view = {
                 <header class="mb-3">
                 <h4>My Todo</h4>
                 <div class="form-inline">
-                    <input type="text" placeholder="add item" id="new-item-input" class="form-control mr-2">
+                    <input type="text" placeholder="add item" id="new-item-input" class="form-control mr-2" data-id="${todoId}">
                     <button id="add-btn" class="btn btn-info add-new-item" data-id="${todoId}">Add</button>
                 </div>
                 </header>
@@ -175,6 +175,50 @@ const view = {
         })
         
     },
+    showRenameTodo () {
+        return new Promise((resolve) => {
+            swal({
+                title: "幫代辦清單重新命名！",
+                text: "為它取一個厲害的新名字吧 !!!",
+                type: "input",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                animation: "slide-from-top",
+                inputPlaceholder: "輸入一段文字"
+              },
+              function(inputValue){
+                if (inputValue === false) return false
+                if (inputValue.trim() === "") {
+                  swal.showInputError("給我輸入文字唷!! 不許空白")
+                  return false
+                }
+                swal("非常好！", "你輸入了：" + inputValue,"success")
+                resolve(inputValue)
+              })
+        })
+    },
+    showDeleteTodoAlter () {
+        return new Promise((resolve) => {
+            swal({
+                title: "確定刪除嗎?",
+                text: "你將無法恢復刪除的代辦清單唷!!",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "確定刪除！",
+                closeOnConfirm: false,
+                closeOnCancel: false
+              },
+              function(isConfirm){
+                if (isConfirm) {
+                  swal("删除！", "待辦清單已被刪除!!。","success")
+                  resolve()
+                } else {
+                  swal("取消！", "未刪除待辦清單","error")
+                }
+              })
+        })
+    },
     renderItem (itemNumber, itemName, itemInformation, finish) {
         const li = document.createElement('li')
         let inf
@@ -201,6 +245,45 @@ const view = {
                 unfinishTodo.appendChild(li)
                 break
         }
+    },
+    showDeleteItemAlter () {
+        return new Promise (resolve => {
+            swal({
+                title: "確定刪除嗎？",
+                text: "刪除的文件就像已經分手的女友，再也回不來！",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "確定刪除！",
+                closeOnConfirm: false
+              },
+              function(){
+                swal("删除！", "清單項目已被删除。", "success")
+                resolve()
+              })
+        })
+    },
+    showCreateInformation () {
+        return new Promise(resolve => {
+            swal({
+                title: "輸入詳細資訊！",
+                text: "為你的清單項目新增一些訊息吧 !!!：",
+                type: "input",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                animation: "slide-from-top",
+                inputPlaceholder: "輸入一些文字"
+              },
+              function(inputValue){
+                if (inputValue === false) return false
+                if (inputValue.trim() === "") {
+                  swal.showInputError("@*$#&!，接收不到你輸入的訊息!")
+                  return false
+                }
+                swal("非常好！", "你輸入了：" + inputValue,"success")
+                resolve(inputValue)
+              })
+        })
     },
     createInformation (target) {
         target.classList.add('fas', 'fa-info-circle', 'more-information')
@@ -240,47 +323,19 @@ const control = {
         view.renderTodoPanel(todoId, todoname)
     },
     deleteTodo (todoId) {
-        swal({
-            title: "確定刪除嗎?",
-            text: "你將無法恢復刪除的代辦清單唷!!",
-            type: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#DD6B55",
-            confirmButtonText: "確定刪除！",
-            closeOnConfirm: false,
-            closeOnCancel: false
-          },
-          function(isConfirm){
-            if (isConfirm) {
-              swal("删除！", "待辦清單已被刪除!!。","success")
-              model.deleteTodo(todoId) 
-              control.createStart()
-            } else {
-              swal("取消！", "未刪除待辦清單","error")
-            }
-          })
+        view.showDeleteTodoAlter()
+        .then(()=>{
+            model.deleteTodo(todoId) 
+            control.createStart()
+        })
     },
     renameTodo (todoId) {
-        swal({
-            title: "幫代辦清單重新命名！",
-            text: "為它取一個厲害的新名字吧 !!!",
-            type: "input",
-            showCancelButton: true,
-            closeOnConfirm: false,
-            animation: "slide-from-top",
-            inputPlaceholder: "輸入一段文字"
-          },
-          function(inputValue){
-            if (inputValue === false) return false
-            if (inputValue.trim() === "") {
-              swal.showInputError("給我輸入文字唷!! 不許空白")
-              return false
-            }
-            swal("非常好！", "你輸入了：" + inputValue,"success")
+        view.showRenameTodo()
+        .then((inputValue) => {
             model.storeRenameTodo (todoId, inputValue)
             view.renderTodoList()
             view.renderTodoPanel(todoId, inputValue)
-          })
+        })
     },
     addTodoItem (todoId) {
         const itemInput = document.querySelector('#new-item-input')
@@ -294,20 +349,11 @@ const control = {
         itemInput.value = ''
     },
     deleteItem (itemNumber, target) {
-        swal({
-            title: "確定刪除嗎？",
-            text: "刪除的文件就像已經分手的女友，再也回不來！",
-            type: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#DD6B55",
-            confirmButtonText: "確定刪除！",
-            closeOnConfirm: false
-          },
-          function(){
-            swal("删除！", "清單項目已被删除。", "success")
+        view.showDeleteItemAlter()
+        .then(()=>{
             target.parentElement.remove()
             model.deleteItem(itemNumber)
-          });
+        })
     },
     finishItem (itemNumber, target) {
         target.classList.toggle('checked')
@@ -317,25 +363,11 @@ const control = {
         finishState ? finishPanel.appendChild(target.parentElement) : unfinishPanel.appendChild(target.parentElement)
     },
     createInformation (itemNumber, target) {
-        swal({
-            title: "輸入詳細資訊！",
-            text: "為你的清單項目新增一些訊息吧 !!!：",
-            type: "input",
-            showCancelButton: true,
-            closeOnConfirm: false,
-            animation: "slide-from-top",
-            inputPlaceholder: "輸入一些文字"
-          },
-          function(inputValue){
-            if (inputValue === false) return false
-            if (inputValue.trim() === "") {
-              swal.showInputError("@*$#&!，接收不到你輸入的訊息!")
-              return false
-            }
-            swal("非常好！", "你輸入了：" + inputValue,"success")
+        view.showCreateInformation()
+        .then(inputValue => {
             model.storeInformaiton(itemNumber, inputValue)
-            view.createInformation(target)
-          })
+            view.createInformation(target)            
+        })
     },
     showInformation (itemNumber) {
         const information = model.getInformation(itemNumber)
@@ -404,6 +436,20 @@ mainBody.addEventListener('click', function clickMainBody(event) {
             } else if (target.matches('.more-information')) {  //顯示額外資訊
                 control.showInformation(number)
             }
+            break
+    }
+})
+
+//DOM事件(按enter輸入)
+mainBody.addEventListener('keypress', function enterInput(event) {
+    if (event.key !== 'Enter' || event.target.tagName !== 'INPUT') return
+    const state = mainBody.dataset.state
+    switch (state) {
+        case 'addNewTodo':
+            control.addNewTodo()
+            break
+        case 'todoList':
+            control.addTodoItem(event.target.dataset.id)
             break
     }
 })
